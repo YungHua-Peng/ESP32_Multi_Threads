@@ -13,3 +13,18 @@
 // See the License for the specific language governing permissions and      //
 // limitations under the License.                                           //
 //==========================================================================//
+
+#define Baud_Rate 115200
+
+//
+// LED pins definition
+//
+#define LED_Pin_0_D 4
+#define LED_Pin_1_D 2
+#define LED_Pin_2_D 15
+
+//
+// Task handles definition
+//
+TaskHandle_t TaskHandle_On_Core_0;
+TaskHandle_t TaskHandle_On_Core_1;
