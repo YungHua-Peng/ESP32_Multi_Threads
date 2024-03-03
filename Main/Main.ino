@@ -16,35 +16,19 @@
 
 #include "ConstantDefinition.h"
 
+// Declare the task functions
+void Create_Tasks(void);
+void Task_Function_Core_1(void * pvParameters);
+void Task_Function_Core_0(void * pvParameters);
+
 void setup() {
-  // Set the serial baud rate. 
+  // Set the serial baud rate
   Serial.begin(Baud_Rate);
 
   //
-  // Create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
+  // Create the tasks
   //
-  xTaskCreatePinnedToCore(
-                    Task_Function_Core_0,   /* Task function. */
-                    "Task1",                /* name of task. */
-                    10000,                  /* Stack size of task */
-                    NULL,                   /* parameter of the task */
-                    1,                      /* priority of the task */
-                    &TaskHandle_On_Core_0,  /* Task handle to keep track of created task */
-                    0);                     /* pin task to core 0 */                  
-  delay(500); 
-
-  //
-  // Create a task that will be executed in the Task2code() function, with priority 1 and executed on core 1
-  //
-  xTaskCreatePinnedToCore(
-                    Task_Function_Core_1,   /* Task function. */
-                    "Task2",                /* name of task. */
-                    10000,                  /* Stack size of task */
-                    NULL,                   /* parameter of the task */
-                    1,                      /* priority of the task */
-                    &TaskHandle_On_Core_1,  /* Task handle to keep track of created task */
-                    1);                     /* pin task to core 1 */
-  delay(500);
+  Create_Tasks();
 
   //
   // Define the pin mode and set the LED status to off
@@ -62,14 +46,41 @@ void setup() {
 // The code in loop() will be run on core 1
 //
 void loop() {
-  Serial.print("Task1 running on core ");
-  Serial.println(xPortGetCoreID());
+  // When using the task features, the main loop should be clean and do nothing.
+}
+
+void Create_Tasks(void) {
+  //
+  // Create a task that will be executed in the Task_Function_Core_0() function, with priority 1 and executed on core 0
+  //
+  xTaskCreatePinnedToCore(
+                    Task_Function_Core_0,   /* Task function. */
+                    "Task1",                /* name of task. */
+                    10000,                  /* Stack size of task */
+                    NULL,                   /* parameter of the task */
+                    1,                      /* priority of the task */
+                    &TaskHandle_On_Core_0,  /* Task handle to keep track of created task */
+                    0);                     /* pin task to core 0 */                  
+  delay(500); 
+
+  //
+  // Create a task that will be executed in the Task_Function_Core_1() function, with priority 1 and executed on core 1
+  //
+  xTaskCreatePinnedToCore(
+                    Task_Function_Core_1,   /* Task function. */
+                    "Task2",                /* name of task. */
+                    10000,                  /* Stack size of task */
+                    NULL,                   /* parameter of the task */
+                    1,                      /* priority of the task */
+                    &TaskHandle_On_Core_1,  /* Task handle to keep track of created task */
+                    1);                     /* pin task to core 1 */
+  delay(500);
 }
 
 //
 // Task1code: Blinks the LED 0 every 1 second
 //
-void Task_Function_Core_0( void * pvParameters ){
+void Task_Function_Core_0(void * pvParameters) {
   Serial.print("Task1 running on core ");
   Serial.println(xPortGetCoreID());
 
