@@ -16,7 +16,9 @@
 
 #include "ConstantDefinition.h"
 
+//
 // Declare the task functions
+//
 void Create_Tasks(void);
 void Task_Function_Core_1(void * pvParameters);
 void Task_Function_Core_0(void * pvParameters);
@@ -25,9 +27,7 @@ void setup() {
   // Set the serial baud rate
   Serial.begin(Baud_Rate);
 
-  //
   // Create the tasks
-  //
   Create_Tasks();
 
   //
@@ -50,9 +50,7 @@ void loop() {
 }
 
 void Create_Tasks(void) {
-  //
   // Create a task that will be executed in the Task_Function_Core_0() function, with priority 1 and executed on core 0
-  //
   xTaskCreatePinnedToCore(
                     Task_Function_Core_0,   /* Task function. */
                     "Task1",                /* name of task. */
@@ -63,9 +61,7 @@ void Create_Tasks(void) {
                     0);                     /* pin task to core 0 */                  
   delay(500); 
 
-  //
   // Create a task that will be executed in the Task_Function_Core_1() function, with priority 1 and executed on core 1
-  //
   xTaskCreatePinnedToCore(
                     Task_Function_Core_1,   /* Task function. */
                     "Task2",                /* name of task. */
