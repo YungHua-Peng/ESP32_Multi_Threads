@@ -28,3 +28,4 @@
 //
 TaskHandle_t TaskHandle_On_Core_0;
 TaskHandle_t TaskHandle_On_Core_1;
+TaskHandle_t TaskHandle_On_Core_1_New;

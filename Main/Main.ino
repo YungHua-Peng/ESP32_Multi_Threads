@@ -17,6 +17,12 @@
 #include "ConstantDefinition.h"
 
 //
+// Declare the global variable
+//
+int   LoopTimes = 1;
+bool  New_Task  = false;
+
+//
 // Declare the task functions
 //
 void Create_Tasks(void);
@@ -44,16 +50,33 @@ void setup() {
 
 //
 // The code in loop() will be run on core 1
+// Usually, when using the task features, the main loop should do nothing
 //
 void loop() {
-  // When using the task features, the main loop should be clean and do nothing.
+  // Check the loop times. If the loop times is more than 5, delete the task handle on core 1.
+  if (LoopTimes > 5 && !New_Task ) {
+    vTaskDelete(TaskHandle_On_Core_1);
+    TaskHandle_On_Core_1 = NULL;
+
+    // Create new task on core 1
+    xTaskCreatePinnedToCore(
+                    Task_Function_Core_1_new,   /* Task function. */
+                    "Task1_new",                /* name of task. */
+                    10000,                      /* Stack size of task */
+                    NULL,                       /* parameter of the task */
+                    1,                          /* priority of the task */
+                    &TaskHandle_On_Core_1_New,  /* Task handle to keep track of created task */
+                    1);                         /* pin task to core 0 */                  
+    delay(500);
+    New_Task = true;
+  }
 }
 
 void Create_Tasks(void) {
   // Create a task that will be executed in the Task_Function_Core_0() function, with priority 1 and executed on core 0
   xTaskCreatePinnedToCore(
                     Task_Function_Core_0,   /* Task function. */
-                    "Task1",                /* name of task. */
+                    "Task0",                /* name of task. */
                     10000,                  /* Stack size of task */
                     NULL,                   /* parameter of the task */
                     1,                      /* priority of the task */
@@ -64,7 +87,7 @@ void Create_Tasks(void) {
   // Create a task that will be executed in the Task_Function_Core_1() function, with priority 1 and executed on core 1
   xTaskCreatePinnedToCore(
                     Task_Function_Core_1,   /* Task function. */
-                    "Task2",                /* name of task. */
+                    "Task1",                /* name of task. */
                     10000,                  /* Stack size of task */
                     NULL,                   /* parameter of the task */
                     1,                      /* priority of the task */
@@ -74,7 +97,7 @@ void Create_Tasks(void) {
 }
 
 //
-// Task1code: Blinks the LED 0 every 1 second
+// Blinks the LED 0 every 1 second
 //
 void Task_Function_Core_0(void * pvParameters) {
   Serial.print("Task1 running on core ");
@@ -89,16 +112,32 @@ void Task_Function_Core_0(void * pvParameters) {
 }
 
 //
-// Task2code: Blinks the LED 1 every 2 seconds
+// Blinks the LED 1 every 2 seconds
 //
-void Task_Function_Core_1( void * pvParameters ){
+void Task_Function_Core_1(void * pvParameters) {
   Serial.print("Task2 running on core ");
   Serial.println(xPortGetCoreID());
 
   while (true) {
+    Serial.print("Loop times = ");
+    Serial.println(LoopTimes);
+
     digitalWrite(LED_Pin_1_D, HIGH);
     delay(2000);
     digitalWrite(LED_Pin_1_D, LOW);
     delay(2000);
+
+    LoopTimes++;
+  }
+}
+
+//
+// Show the information every 1 seconds
+//
+void Task_Function_Core_1_new(void * pvParameters) {
+  while (true) {
+    Serial.print("New task running on core ");
+    Serial.println(xPortGetCoreID());
+    delay(1000);
   }
 }
